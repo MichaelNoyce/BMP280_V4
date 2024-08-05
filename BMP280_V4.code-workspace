@@ -1,0 +1,25 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"stm32l4xx_hal_conf.h": "c",
+			"stm32l4xx_hal_uart.h": "c",
+			"stm32l4xx_hal.h": "c",
+			"hal_mock.h": "c",
+			"stm32l4xx_hal_gpio.h": "c",
+			"stdio.h": "c",
+			"random": "cpp",
+			"*.tcc": "cpp",
+			"cstdint": "cpp",
+			"main.h": "c",
+			"freertosconfig.h": "c",
+			"portmacro.h": "c",
+			"timers.h": "c",
+			"task.h": "c"
+		}
+	}
+}
