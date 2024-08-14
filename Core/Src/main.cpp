@@ -42,9 +42,13 @@ int main(void) {
     SystemClock_Config();
     setupHAL(&halImpl);
 
+    // Initialize Peripherals
+    // MX_SPI1_Init();
+	// Init_Control_Pins();
+
 	//printmsg("SHARC BUOY STARTING! \r\n");
 //=================================== 1. END ====================================//
-
+    
     // Create a blinking LED task for the on-board LED.
     static StaticTask_t exampleTaskTCB;
     static StackType_t exampleTaskStack[ 512 ];

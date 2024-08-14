@@ -13,6 +13,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
+# Verbose option
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 if(CMAKE_CROSSCOMPILING)
 	include(CMake/scripts.cmake)
 	include(CMake/mcu.cmake)
@@ -71,19 +74,27 @@ if(NOT CMAKE_CROSSCOMPILING)
 
 	add_subdirectory(Modules)
 
+	# Device driver subdirectory 
+	add_subdirectory(BMP280_Driver)
+
 	# Add test subdirectory
 	add_subdirectory(Tests)
 
-	#target_link_libraries(run_tests
-	#	PUBLIC STM32CUBEL4_HAL
-	#)
+	# Link the BMP280_Driver library to the HAL library
+	# target_link_libraries(BMP280_Driver
+	# 	PUBLIC SHARC::HAL
+	# )
+
+	target_link_libraries(run_tests
+		PUBLIC STM32CUBEL4_HAL
+	)
 	
 endif()
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm")
 
 	add_subdirectory(Modules)
-	
+
 	set(APPLICATION_INCLUDE_DIRECTORIES
 		${CMAKE_SOURCE_DIR}/Core/Inc
 		${CMAKE_SOURCE_DIR}/Core/Inc/HAL_Init
@@ -121,6 +132,13 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm")
 		PUBLIC SHARC::RTOS
 	)
 
+	# Device driver subdirectory
+	add_subdirectory(BMP280_Driver)
+
+	# # Link the BMP280_Driver library to the HAL library
+	target_link_libraries(BMP280_Driver
+	 	PUBLIC SHARC::HAL
+	)
 
 	target_link_options(${TARGET_EXECUTABLE} PRIVATE
 		LINKER:-Map=${CMAKE_PROJECT_NAME}.map,--cref
