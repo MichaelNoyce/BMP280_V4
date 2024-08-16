@@ -329,6 +329,22 @@ BMPStatus_t BMP280::BMP280_Force_Measure(uint32_t& temp, uint32_t& pressure)
 	return BMP_OK;
 }
 
+BMPStatus_t BMP280::BMP280_Normal_Measure(uint32_t& temp, uint32_t& pressure)
+{
+	//write forced mode to register
+	BMP280_Set_PowerMode(BMP280_CTRLMEAS_MODE_NORMAL);
+	//wait for device to finish converting
+	uint8_t status;
+	BMP280_Read_Register(ctrl_meas,1,&status);
+	while((status&0b11) != 0)
+	{
+		BMP280_Read_Register(ctrl_meas,1,&status);
+	}
+
+	return BMP_OK;
+}
+
+
 
 /*
  * @brief Read measurement data (any mode)

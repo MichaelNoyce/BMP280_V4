@@ -3,6 +3,10 @@ The BMP280 is the environmental sensor used on the UCT SHARC Buoy.
 The BMP280 is an absolute barometric pressure sensor developed by [Bosch](https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/bmp280/).Intended role is to determine the internal conditions of the buoy's electronics during deployment and
 investigate modes of failure. 
 
+The flow diagram for the measurement cycle of the BMP280 is as follows (taken from BMP280 user manual):
+
+![Flow diagram](MeasurementCycle.png)
+
 ## Features
 
 - Targeting the power-efficient STM32L4 microcontroller

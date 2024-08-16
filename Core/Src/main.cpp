@@ -63,7 +63,7 @@ int main(void) {
     // Environmental Sensor Init Routine
 	BMP_Init_Typedef BMP_InitStruct = { 0 };
 	
-    //configure device for environmental sensing
+    //configure device for environmental sensing in forced mode
 	BMP_InitStruct.BMP_Pressure_OverSample = BMP280_CTRLMEAS_OSRSP_OS_1;
 	BMP_InitStruct.BMP_Temperature_OverSample = BMP280_CTRLMEAS_OSRST_OS_1;
 	BMP_InitStruct.BMP_IIR_FILTER_COEFFICIENTS = BMP280_CONFIG_FILTER_COEFF_OFF;
@@ -103,6 +103,23 @@ int main(void) {
 
 //=================================== 2. END ====================================//
 
+//=================================== 3. BMP280 DMA Test ========================//
+
+
+
+    //configure device for environmental sensing in normal mode
+	BMP_InitStruct.BMP_Pressure_OverSample = BMP280_CTRLMEAS_OSRSP_OS_1;
+	BMP_InitStruct.BMP_Temperature_OverSample = BMP280_CTRLMEAS_OSRST_OS_1;
+	BMP_InitStruct.BMP_IIR_FILTER_COEFFICIENTS = BMP280_CONFIG_FILTER_COEFF_OFF;
+	BMP_InitStruct.BMP_Power_Mode = BMP280_CTRLMEAS_MODE_FORCED;
+//Implement DMA for SPI
+
+    // Enable the DMA for SPI
+    HAL_SPI_Receive_DMA(&hspi1, (uint8_t*)bmpHandle.Factory_Trim.dig_T1, 24);
+    
+//=================================== 3. END ====================================//
+
+//=================================== 4. FreeRTOS Task Creation ========================//
     // Create a blinking LED task for the on-board LED.
     static StaticTask_t exampleTaskTCB;
     static StackType_t exampleTaskStack[ 512 ];
@@ -126,6 +143,8 @@ int main(void) {
     vTaskStartScheduler();
 
     }
+
+//=================================== 4. END ====================================//
 
 }
 

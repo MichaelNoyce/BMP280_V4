@@ -255,6 +255,22 @@ public:
     */
     BMPStatus_t BMP280_Force_Measure(uint32_t& temp, uint32_t& pressure);
 
+
+    /**  
+    * Function Name BMPStatus_t BMP280_Normal_Measure(uint32_t* temp,uint32_t* pressure);
+    *
+    * @brief: Configure the device for a normal measurement cycle 
+    * 
+    * @details Normal mode cycles between a standy period and a measurement period 
+    * 
+    * @param temp - pointer to 32 bit integer to store the temperature ADC value
+    *
+    * @param pressure - pointer to 32 bit integer to store the pressure ADC value.
+    *
+    * @return BMPStatus_t - return status of function
+    */
+    BMPStatus_t BMP280_Normal_Measure(uint32_t& temp, uint32_t& pressure);
+
     /**  
     * Function Name BMPStatus_t BMP280_Get_Temp(uint32_t adc_TEMP);
     *
