@@ -11,9 +11,9 @@
 
 class BMP280 : public SensorBase {
 public:
-    
+
     // Constructor that accepts a handler for a communication interface
-    BMP280(SPIHandler* handler, BMP_Handle_Typedef* bmp, BMP_Init_Typedef* bmp_init) : handler(handler), bmp(bmp), bmp_init(bmp_init){
+    BMP280(SPIHandler& handler, BMP_Handle_Typedef& bmp, BMP_Init_Typedef& bmp_init) : handler(handler), bmp(bmp), bmp_init(bmp_init){
         // Initialize BMP280 sensor specific settings here
     }
 
@@ -22,20 +22,27 @@ public:
         // Cleanup BMP280 sensor resources here
     }
 
+    // Public member variables
+    BMP_Handle_Typedef& bmp; // BMP280 handler
+
+    //======================== 0. SensorBase Virtual Functions =========================================
+
     // Override SensorBase's virtual functions
     void initialize() override {  
+    }
+
+    float readData() override {
+        return 0.0f;
     }
 
     void calibrate() override {
     }
 
     void reset() override {
-    }   
+    }
 
-    private:
-        BMP_Init_Typedef* bmp_init;		//instance of BMP_Init_Typedef
-        BMP_Handle_Typedef* bmp;			//instance of BMP_Handle_Typedef
-        SPIHandler* handler; // Generic handler pointer for communication interface
+    //======================== 1. BMP280 Init Function Prototypes =========================================  
+
 
     /**
     * Function Name void BMP280_Init_Preset_Mode(BMP_Opp_Mode_t BMP_MODE, BMP_Init_Typedef* BMP_InitStruct);
@@ -75,7 +82,7 @@ public:
     * @return: BMPStatus_t - status of initialisation function
     *
     */
-    BMPStatus_t BMP280_Init(BMP_Init_Typedef* BMP_InitStruct);
+    BMPStatus_t BMP280_Init(BMP_Init_Typedef& BMP_InitStruct);
 
     /** 
     * Function Name BMPStatus_t BMP280_DeInit(void)
@@ -88,7 +95,7 @@ public:
     */
     BMPStatus_t BMP280_DeInit(void);
 
-    //======================== 6. Reg Config Function Prototypes =========================================
+    //======================== 2. Reg Config Function Prototypes =========================================
 
     /**
     * Function Name BMPStatus_t BMP280_Reset(void);
@@ -179,7 +186,7 @@ public:
     */
     BMPStatus_t BMP280_Read_Register(uint8_t reg,int32_t size, uint8_t* data);
 
-    //======================== 7. Data Read Function Prototypes=========================================
+    //======================== 3. Data Read Function Prototypes=========================================
 
     /** 
     * Function Name: BMPStatus_t BMP280_Get_Measurements(uint32_t* adc_Temp,uint32_t* adc_Press);
@@ -194,7 +201,7 @@ public:
     *
     * @return BMPStatus_t - return status of function
     */
-    BMPStatus_t BMP280_Get_Measurements(uint32_t* adc_Temp,uint32_t* adc_Press);
+    BMPStatus_t BMP280_Get_Measurements(uint32_t& adc_Temp,uint32_t& adc_Press);
 
     /** 
     * Function Name BMPStatus_t BMP280_Get_Status(BMP_Handle_Typedef* bmp);
@@ -231,7 +238,7 @@ public:
     */
     BMPStatus_t BMP280_Get_FactoryTrim( BMP280_trim_t *bmpt);
 
-    //======================== 8. Measurement Function Prototypes=========================================
+    //======================== 4. Measurement Function Prototypes=========================================
 
     /**  
     * Function Name BMPStatus_t BMP280_Force_Measure(uint32_t* temp,uint32_t* pressure);
@@ -246,7 +253,7 @@ public:
     *
     * @return BMPStatus_t - return status of function
     */
-    BMPStatus_t BMP280_Force_Measure(uint32_t* temp, uint32_t* pressure);
+    BMPStatus_t BMP280_Force_Measure(uint32_t& temp, uint32_t& pressure);
 
     /**  
     * Function Name BMPStatus_t BMP280_Get_Temp(uint32_t adc_TEMP);
@@ -290,7 +297,7 @@ public:
     * @return int32_t representation of the compensated temperature. in degrees C
     * 		   (last 2 digits of the value represent the first 2 signifcant places)
     */
-    int32_t BMP280_Compensate_Temp(int32_t T_val,int32_t* t_fine, BMP280_trim_t bmp_trim);
+    int32_t BMP280_Compensate_Temp(int32_t T_val,int32_t& t_fine, BMP280_trim_t bmp_trim);
 
     /** 
     * Function Name: uint32_t BMP280_Compensate_Pressure(uint32_t P_val,int32_t t_fine,BMP280_trim_t bmp_trim);
@@ -306,6 +313,10 @@ public:
     * @return uin32_t representation of compensated atmoshperic pressure in Pa
     */
     uint32_t BMP280_Compensate_Pressure(uint32_t P_val,int32_t t_fine,BMP280_trim_t bmp_trim);
+
+    private:
+        BMP_Init_Typedef& bmp_init;		//instance of BMP_Init_Typedef
+        SPIHandler& handler; // Generic handler pointer for communication interface
 
 
 };

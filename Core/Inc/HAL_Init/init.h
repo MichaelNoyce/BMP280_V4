@@ -28,6 +28,18 @@ void MX_GPIO_Init(void);
  */
 void MX_LPUART1_UART_Init(void);
 
+/**
+ * @brief DMA initialization function
+ * 
+ */
+void MX_DMA_Init(void);
+
+/**
+ * @brief SPI Initialization Function
+ * @param None
+ */
+void MX_SPI1_Init(void);
+
 #ifdef __cplusplus
 }
 #endif

@@ -2,7 +2,7 @@
 #include "hal_impl.hpp"
 
 
-//========================= Init Function Definitions =============================
+//========================= 1. Init Function Definitions =============================
          
 /** 
 * @brief: Initialises the sensor handler and performs power on/ begining procedure.
@@ -13,7 +13,7 @@
 * @param: BMP_InitStruct - struct containing the configuration values for initialising the sensor
 * @retval BMPStatus_t - return value showing the status of the function for error handling
 */
-BMPStatus_t BMP280::BMP280_Init(BMP_Init_Typedef * BMP_InitStruct){
+BMPStatus_t BMP280::BMP280_Init(BMP_Init_Typedef& BMP_InitStruct){
 {
 
 //NOTE: Necessary Peripherals must be initialized in main before calling this function
@@ -35,14 +35,14 @@ BMPStatus_t BMP280::BMP280_Init(BMP_Init_Typedef * BMP_InitStruct){
     BMP280_Reset();
     
     //read factory trim values
-    BMP280_Get_FactoryTrim(&(bmp->Factory_Trim));
+    BMP280_Get_FactoryTrim(&(bmp.Factory_Trim));
     
     //get init data
-    bmp->Init = *BMP_InitStruct;
+    bmp.Init = BMP_InitStruct;
     
     //write data to ctrl_meas register
-    uint8_t ctrlmeasbyte = bmp->Init.BMP_Pressure_OverSample |bmp->Init.BMP_Temperature_OverSample;
-    uint8_t configbyte = bmp->Init.BMP_t_Standby | bmp->Init.BMP_IIR_FILTER_COEFFICIENTS;
+    uint8_t ctrlmeasbyte = bmp.Init.BMP_Pressure_OverSample |bmp.Init.BMP_Temperature_OverSample;
+    uint8_t configbyte = bmp.Init.BMP_t_Standby | bmp.Init.BMP_IIR_FILTER_COEFFICIENTS;
     flag = BMP280_Write_Register(ctrl_meas,1,&ctrlmeasbyte);
     
     if(flag != BMP_OK)
@@ -56,9 +56,9 @@ BMPStatus_t BMP280::BMP280_Init(BMP_Init_Typedef * BMP_InitStruct){
     }
 
     //in a seperate write, configure the power mode
-    if(bmp->Init.BMP_Power_Mode != BMP280_CTRLMEAS_MODE_SLEEP)
+    if(bmp.Init.BMP_Power_Mode != BMP280_CTRLMEAS_MODE_SLEEP)
     {
-        flag = BMP280_Set_PowerMode(bmp->Init.BMP_Power_Mode);
+        flag = BMP280_Set_PowerMode(bmp.Init.BMP_Power_Mode);
         if(flag != BMP_OK)
         {
             return BMP_POWER_CONFIG_ERROR;
@@ -70,7 +70,7 @@ BMPStatus_t BMP280::BMP280_Init(BMP_Init_Typedef * BMP_InitStruct){
     }
 }
 
-//======================== Reg Config Function Defintions =========================================
+//======================== 2. Reg Config Function Defintions =========================================
 
 /** 
 * @brief Function to Read data from an 8-bit register in the BMP280. Setting the size variable to
@@ -84,9 +84,9 @@ BMPStatus_t BMP280::BMP280_Init(BMP_Init_Typedef * BMP_InitStruct){
 BMPStatus_t BMP280::BMP280_Read_Register(uint8_t reg, int32_t size, uint8_t* data)
 {
     uint8_t temp = reg | BMP280_SPI_READ;
-    if (handler->transmit(&temp, 1, 100) == BMP_OK)
+    if (handler.transmit(&temp, 1, 100) == BMP_OK)
     {
-        if (handler->receive(data, size, 100) != BMP_OK)
+        if (handler.receive(data, size, 100) != BMP_OK)
         {
             return BMP_SPI_READ_ERROR;
         }
@@ -114,12 +114,12 @@ BMPStatus_t BMP280::BMP280_Write_Register(uint8_t reg,int32_t size, uint8_t* dat
     
     uint8_t temp = reg & BMP280_SPI_WRITE;
     
-    if(handler->transmit(&temp, 1, 100) != BMP_OK)
+    if(handler.transmit(&temp, 1, 100) != BMP_OK)
     {
         return BMP_SPI_WRITE_ERROR;
     }
     
-    if(handler->transmit(data, size, 100) != BMP_OK)
+    if(handler.transmit(data, size, 100) != BMP_OK)
     {
         return BMP_SPI_WRITE_ERROR;
     }
@@ -186,7 +186,7 @@ BMPStatus_t BMP280::BMP280_Set_PowerMode(uint8_t mode)
     return BMP_OK;
 }
 
-/*
+/** 
 * @brief configure oversample parameters
 *
 * @param osrs_t
@@ -262,7 +262,7 @@ BMPStatus_t BMP280::BMP280_Set_Standby_Time (uint8_t stdby)
     return BMP_OK;
 }
 
-//======================== 7. Data Read Function Definitions =========================================
+//======================== 4. Data Read Function Definitions =========================================
 
 /*
 * @brief IM Copy and Conversion status read function
@@ -311,9 +311,9 @@ BMPStatus_t BMP280::BMP280_Get_FactoryTrim( BMP280_trim_t *bmpt)
     return BMP_OK;
 }
 
-//======================== 8. Measurement Function Definitions =========================================
+//======================== 5. Measurement Function Definitions =========================================
 
-BMPStatus_t BMP280::BMP280_Force_Measure(uint32_t* temp, uint32_t* pressure)
+BMPStatus_t BMP280::BMP280_Force_Measure(uint32_t& temp, uint32_t& pressure)
 {
 	//write forced mode to register
 	BMP280_Set_PowerMode(BMP280_CTRLMEAS_MODE_FORCED);
@@ -339,14 +339,14 @@ BMPStatus_t BMP280::BMP280_Force_Measure(uint32_t* temp, uint32_t* pressure)
  * @retval BMPStatus_t
  */
 
-BMPStatus_t BMP280::BMP280_Get_Measurements(uint32_t* adc_Temp, uint32_t* adc_Press)
+BMPStatus_t BMP280::BMP280_Get_Measurements(uint32_t& adc_Temp, uint32_t& adc_Press)
 {
 	uint8_t data[6] = {0};
 	BMP280_Read_Register(press_msb,6,data);
-	*adc_Temp = ((data[3]&0xFF)<<16)|((data[4]&0xFF)<<8)|((data[5]&0xF0));
-	*adc_Temp= *adc_Temp>> 4;
+	adc_Temp = ((data[3]&0xFF)<<16)|((data[4]&0xFF)<<8)|((data[5]&0xF0));
+	adc_Temp= adc_Temp>> 4;
 	uint32_t temp= ((data[0]&0xFF)<<16)|((data[1]&0xFF)<<8)|((data[2]&0xFF))/16;
-	*adc_Press = temp/16;
+	adc_Press = temp/16;
 	//convert to 20 bit unsigned integers
 	return BMP_OK;
 }
@@ -386,13 +386,13 @@ BMPStatus_t BMP280::BMP280_Get_Temp(uint32_t* adc_Temp)
  *
  * @retval int32_t
  */
-int32_t BMP280_Compensate_Temp(int32_t T_val,int32_t* t_fine, BMP280_trim_t bmp_trim)
+int32_t  BMP280::BMP280_Compensate_Temp(int32_t T_val,int32_t& t_fine, BMP280_trim_t bmp_trim)
 {
 	//compensate Temperature from datasheet
 	int32_t var1 = (((T_val>>3)- ((int32_t)bmp_trim.dig_T1<<1))*((int32_t)bmp_trim.dig_T2))>>11;
 	int32_t var2 =  (((((T_val>>4) - ((int32_t)bmp_trim.dig_T1)) * ((T_val>>4) - ((int32_t)bmp_trim.dig_T1))) >> 12)*((int32_t)bmp_trim.dig_T3)) >> 14;
 	int32_t temp = var1+var2; //for storage in global variable
-	*t_fine = temp;
+	t_fine = temp;
 	return (temp*5 +128)/256;
 }
 
@@ -430,7 +430,7 @@ BMPStatus_t BMP280::BMP280_Get_Pressure(uint32_t* adc_Press)
  *
  * @retval uint32_t
  */
-uint32_t BMP280_Compensate_Pressure(uint32_t P_val,int32_t t_fine,BMP280_trim_t bmp_trim)
+uint32_t  BMP280::BMP280_Compensate_Pressure(uint32_t P_val,int32_t t_fine,BMP280_trim_t bmp_trim)
 {
 	//Compensation formula
 	int32_t var1 = (int64_t)t_fine - 128000;

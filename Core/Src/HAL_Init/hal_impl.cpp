@@ -16,6 +16,14 @@ void HAL_Impl::MX_LPUART1_UART_Init() {
     ::MX_LPUART1_UART_Init();
 }
 
+void HAL_Impl::MX_DMA_Init() {
+    ::MX_DMA_Init();
+}
+
+void HAL_Impl::MX_SPI1_Init() {
+    ::MX_SPI1_Init();
+}
+
 void HAL_Impl::HAL_GPIO_TogglePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin) {
     ::HAL_GPIO_TogglePin(GPIOx, GPIO_Pin);
 }

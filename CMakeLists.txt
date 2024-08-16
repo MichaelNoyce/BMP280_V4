@@ -130,6 +130,7 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm")
 	target_link_libraries(${TARGET_EXECUTABLE} 
 		PUBLIC SHARC::HAL
 		PUBLIC SHARC::RTOS
+		PUBLIC SHARC::ENV
 	)
 
 	# Device driver subdirectory

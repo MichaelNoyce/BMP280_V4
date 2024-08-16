@@ -1,6 +1,7 @@
 #include "main.hpp"
 #include "hal_interface.hpp"
 #include "hal_impl.hpp"
+#include "BMP280.hpp"
 
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 #pragma GCC diagnostic ignored "-Wformat"
@@ -26,6 +27,8 @@ extern "C" {
 
 //======================== 0. Peripheral Handles ============================================================
 UART_HandleTypeDef hlpuart1;
+SPI_HandleTypeDef hspi1;
+DMA_HandleTypeDef hdma_spi1_rx;
 HAL_Impl halImpl;
 
 //======================== 0. END ============================================================================
@@ -43,12 +46,63 @@ int main(void) {
     setupHAL(&halImpl);
 
     // Initialize Peripherals
-    // MX_SPI1_Init();
+    halImpl.MX_SPI1_Init();
+    halImpl.MX_DMA_Init();
 	// Init_Control_Pins();
 
-	//printmsg("SHARC BUOY STARTING! \r\n");
+	//printmsg("SHARC BUOY STARTING! \r\n");    
 //=================================== 1. END ====================================//
-    
+
+//======================== 2. BMP280 Polling Implementation =====================================//
+
+    // Initialize the BMP280 sensor
+    SPIHandler spiHandler(hspi1);
+    BMP_Handle_Typedef bmpHandle;
+    BMP_Init_Typedef bmpInit;
+
+    // Environmental Sensor Init Routine
+	BMP_Init_Typedef BMP_InitStruct = { 0 };
+	
+    //configure device for environmental sensing
+	BMP_InitStruct.BMP_Pressure_OverSample = BMP280_CTRLMEAS_OSRSP_OS_1;
+	BMP_InitStruct.BMP_Temperature_OverSample = BMP280_CTRLMEAS_OSRST_OS_1;
+	BMP_InitStruct.BMP_IIR_FILTER_COEFFICIENTS = BMP280_CONFIG_FILTER_COEFF_OFF;
+	BMP_InitStruct.BMP_Power_Mode = BMP280_CTRLMEAS_MODE_FORCED;
+
+    // Create the BMP280 object
+    BMP280 bmp280(spiHandler, bmpHandle, bmpInit);
+
+    // Environmental data struct
+
+
+    // Initialize the BMP280 sensor
+    if (bmp280.BMP280_Init(BMP_InitStruct) == BMP_OK) {
+		printmsg("Environmental Sensor Online!\r\n");
+		
+        //create variables
+		uint32_t temp, press;
+		int32_t t_fine;
+        EnvData_t BMP280Data;
+
+
+		for (int i = 0; i < 2; ++i) //60 second compensation period for averaging
+		{
+			
+            bmp280.BMP280_Force_Measure(temp, press);		//trigger conversion
+			BMP280Data.env_Temp = bmp280.BMP280_Compensate_Temp(temp, t_fine, 
+            bmpHandle.Factory_Trim);			//compensate temperature
+			BMP280Data.atm_Press = bmp280.BMP280_Compensate_Pressure(press, t_fine,
+					bmpHandle.Factory_Trim) / 256;	//compensate pressure
+			
+            halImpl.HAL_Delay(1000);
+
+		}
+
+		printmsg("Temp = %ld C \t Pressure = %lu Pa \r\n", BMP280Data.env_Temp,
+				BMP280Data.atm_Press);
+
+//=================================== 2. END ====================================//
+
     // Create a blinking LED task for the on-board LED.
     static StaticTask_t exampleTaskTCB;
     static StackType_t exampleTaskStack[ 512 ];
@@ -71,14 +125,9 @@ int main(void) {
     // Start scheduler 
     vTaskStartScheduler();
 
-while(1){
-	halImpl.HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
-	halImpl.HAL_Delay(1000);
-}
-
+    }
 
 }
-
 
 //Debug Print
 void printmsg(char *format,...) {

@@ -16,7 +16,8 @@
         "freertosconfig.h": "c",
         "task.h": "c",
         "stm32l4xx_hal_conf.h": "c",
-        "cstdint": "cpp"
+        "cstdint": "cpp",
+        "init.h": "c"
     },
 
     "editor.fontSize": 16,
@@ -28,10 +29,12 @@
         "GPIO",
         "GPIOB",
         "hlpuart",
+        "hspi",
         "huart",
         "IHAL",
         "LPUART",
         "printmsg",
+        "SENSORBASE",
         "SHARC",
         "wavebuffer"
     ],

@@ -179,4 +179,11 @@ typedef struct
 	BMP280_trim_t Factory_Trim;
 }BMP_Handle_Typedef;
 
+
+typedef struct
+{
+	int32_t env_Temp;
+	int32_t atm_Press;
+}EnvData_t;
+
 #endif // BMP280_STRUCTS_HPP

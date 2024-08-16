@@ -17,4 +17,6 @@ void setupHAL(IHAL* hal) {
     hal->SystemClock_Config();
     hal->MX_GPIO_Init();
     hal->MX_LPUART1_UART_Init();
+    hal->MX_DMA_Init();
+    hal->MX_SPI1_Init();
 }
